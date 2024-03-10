@@ -59,7 +59,6 @@ export default function Home() {
 
   const handleGenerate = () => {
     // Handle the generation logic using the formObj data
-    console.log("Generating with data:", formObj);
     // Add your logic here...
     // Close the modal after generating if needed
     // closeModal();

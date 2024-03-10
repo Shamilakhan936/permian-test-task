@@ -14,7 +14,6 @@ export const AgentTable = ({ users }) => {
         </thead>
         <tbody>
           {users.map((user) => {
-            console.log("user", user);
             return (
               <tr key={user.id}>
                 <td className="py-2 px-4 border-b text-center">{user.name}</td>
