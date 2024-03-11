@@ -1,16 +1,15 @@
 "use client";
 
 import { UserButton } from "@clerk/nextjs";
-import { CiMobile1 } from "react-icons/ci";
-import { FaTabletScreenButton } from "react-icons/fa6";
-import { CiDesktop } from "react-icons/ci";
 import { useState } from "react";
 import { AgentModal } from "../components/Modal/AgentModal";
 import { AgentTable } from "../components/AgentTable/AgentTable";
+import CreateAgentSuccess from "../components/Modal/CreateAgentSuccess";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formObj, setFormObj] = useState({});
+  const [isCalendyOpen, setIsCalendyOpen] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -19,6 +18,7 @@ export default function Home() {
       instructions: "",
       tone: "",
       phoneNumber: "",
+      calendly: "",
     });
   };
 
@@ -55,20 +55,20 @@ export default function Home() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setIsCalendyOpen(false);
   };
 
   const handleGenerate = () => {
-    // Handle the generation logic using the formObj data
-    // Add your logic here...
-    // Close the modal after generating if needed
-    // closeModal();
     setFormObj({
       name: "",
       instructions: "",
       tone: "",
       phoneNumber: "",
     });
+    setIsModalOpen(false);
+    setIsCalendyOpen(false);
   };
+
   return (
     <div className="h-screen bg-[#7926c5]">
       <div className="flex items-center p-4 justify-end">
@@ -93,7 +93,11 @@ export default function Home() {
         formObj={formObj}
         setFormObj={setFormObj}
         onGenerate={handleGenerate}
+        setIsCalendyOpen={setIsCalendyOpen}
+        isCalendyOpen={isCalendyOpen}
       />
+
+      {/* <CreateAgentSuccess /> */}
     </div>
   );
 }

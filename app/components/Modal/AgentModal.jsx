@@ -1,9 +1,14 @@
+import { useState } from "react";
+import CalendlyEmbed from "../Calendly/Calendly";
+
 export const AgentModal = ({
   isOpen,
   closeModal,
   formObj,
   setFormObj,
   onGenerate,
+  isCalendyOpen,
+  setIsCalendyOpen,
 }) => {
   return (
     isOpen && (
@@ -63,9 +68,34 @@ export const AgentModal = ({
               setFormObj({ ...formObj, phoneNumber: e.target.value })
             }
           ></input>
+          <button
+            className="bg-white text-black border w-full px-6 py-4 rounded-md hover:bg-green focus:outline-none focus:shadow-outline-green mt-8"
+            onClick={() => {
+              setIsCalendyOpen(true);
+            }}
+          >
+            Connect to your calendly
+          </button>
+          {isCalendyOpen && (
+            <CalendlyEmbed
+              url={
+                process.env.CALENDLY_URL
+                  ? process.env.CALENDLY_URL
+                  : "https://calendly.com/shamilak936/30min"
+                  }
+            />
+          )}
+          {/* <CalendlyEmbed url="https://calendly.com/shamilak936/30min" /> */}
 
-          {/* Other form inputs... */}
-
+          <input
+            className="bg-[#ebebeb] w-full h-8 p-2 rounded-md mt-4"
+            id="phoneNumber"
+            value=""
+            onChange={(e) =>
+              setFormObj({ ...formObj, calendly: e.target.value })
+            }
+            placeholder="Write any other time you’re available"
+          ></input>
           <button
             className="bg-indigo-600 text-white px-6 py-4 rounded-md hover:bg-green focus:outline-none focus:shadow-outline-green w-full mt-8"
             onClick={onGenerate}

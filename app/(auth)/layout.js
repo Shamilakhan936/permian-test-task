@@ -9,7 +9,18 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>{children}</body>
+        <body
+          style={{
+            height: "100vh",
+            background: "#7926c5",
+            margin: 0,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
