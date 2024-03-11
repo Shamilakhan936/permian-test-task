@@ -6,9 +6,10 @@ export const AgentModal = ({
   closeModal,
   formObj,
   setFormObj,
-  onGenerate,
+  onClick,
   isCalendyOpen,
   setIsCalendyOpen,
+  isEdit,
 }) => {
   return (
     isOpen && (
@@ -20,7 +21,6 @@ export const AgentModal = ({
             </button>
           </div>
 
-          {/* Your form inputs */}
           <label htmlFor="name" className="text-md font-medium">
             Name
           </label>
@@ -82,7 +82,7 @@ export const AgentModal = ({
                 process.env.CALENDLY_URL
                   ? process.env.CALENDLY_URL
                   : "https://calendly.com/shamilak936/30min"
-                  }
+              }
             />
           )}
           {/* <CalendlyEmbed url="https://calendly.com/shamilak936/30min" /> */}
@@ -98,9 +98,9 @@ export const AgentModal = ({
           ></input>
           <button
             className="bg-indigo-600 text-white px-6 py-4 rounded-md hover:bg-green focus:outline-none focus:shadow-outline-green w-full mt-8"
-            onClick={onGenerate}
+            onClick={onClick}
           >
-            Generate
+            {isEdit ? "Update" : "Generate"}
           </button>
         </div>
       </div>
