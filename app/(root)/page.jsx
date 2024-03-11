@@ -1,47 +1,44 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import { AgentModal } from "../components/Modal/AgentModal";
 import { AgentTable } from "../components/AgentTable/AgentTable";
 import CreateAgentSuccess from "../components/Modal/CreateAgentSuccess";
+import { v4 } from "uuid";
 
 export default function Home() {
+  const { user, isLoaded } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formObj, setFormObj] = useState({});
   const [isCalendyOpen, setIsCalendyOpen] = useState(false);
   const [edit, setEdit] = useState(false);
   const [agentCreated, setAgentCreated] = useState(false);
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      instructions: "123-456-7890",
-      tone: "Tone",
-      phoneNumber: "123-456-7890",
-    },
-    {
-      id: 2,
-      name: "John Dee",
-      instructions: "123 -456-7890",
-      tone: "Tone",
-      phoneNumber: "123",
-    },
-    {
-      id: 3,
-      name: "John Lii",
-      instructions: "123",
-      tone: "Tone",
-      phoneNumber: "123",
-    },
-    {
-      id: 4,
-      name: "Jane Smith",
-      instructions: "987-654-3210",
-      tone: "Tone",
-      phoneNumber: "987-654-88",
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState({});
+  const [users, setUsers] = useState([]);
+
+  const createAgent = async () => {
+    const response = await fetch(`/api/agent/new`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        clerkId: user.id,
+        name: formObj.name,
+        instructions: formObj.instructions,
+        tone: formObj.tone,
+        phoneNumber: formObj.phoneNumber,
+        calendly: formObj.calendly,
+      }),
+    });
+    const data = await response.json();
+    setUserData(data);
+    setLoading(false);
+  };
+
+  console.log("user data", userData);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -61,7 +58,23 @@ export default function Home() {
     setIsCalendyOpen(false);
     setEdit(false);
   };
-  const handleGenerate = () => {
+
+  // const createAgent = async () => {
+  //   try {
+  //     // const newAgent = {
+  //     //   name: formObj.name,
+  //     //   instructions: formObj.instructions,
+  //     //   tone: formObj.tone,
+  //     //   phoneNumber: formObj.phoneNumber,
+  //     //   calendly: formObj.calendly,
+  //     // };
+  //     // await createOrUpdateAgent(newAgent);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  const handleGenerate = async () => {
     if (!edit) {
       const newAgent = {
         id: users.length + 1,
@@ -70,6 +83,7 @@ export default function Home() {
       setUsers((prevUsers) => [...prevUsers, newAgent]);
       setIsModalOpen(false);
       setAgentCreated(true);
+      createAgent();
     } else {
       setUsers((prevUsers) => {
         const updatedUsers = prevUsers.map((user) =>
@@ -105,17 +119,19 @@ export default function Home() {
         </button>
         <UserButton />
       </div>
-      <div>
-        <div className="container mx-auto p-4 bg-white rounded">
-          <h2 className="text-2xl font-bold mb-4">User List</h2>
-          <AgentTable
-            users={users}
-            handleEditClick={handleEditClick}
-            handleDeleteClick={handleDeleteClick}
-            setEdit={setEdit}
-          />
+      {users.length > 0 && (
+        <div>
+          <div className="container mx-auto p-4 bg-white rounded">
+            <h2 className="text-2xl font-bold mb-4">User List</h2>
+            <AgentTable
+              users={users}
+              handleEditClick={handleEditClick}
+              handleDeleteClick={handleDeleteClick}
+              setEdit={setEdit}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       <AgentModal
         isOpen={isModalOpen}
