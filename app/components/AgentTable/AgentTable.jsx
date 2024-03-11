@@ -16,7 +16,7 @@ export const AgentTable = ({ users, handleEditClick, setEdit, handleDeleteClick 
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => {
+          {users?.map((user) => {
             return (
               <tr key={user.id}>
                 <td className="py-2 px-4 text-center">{user.name}</td>
@@ -30,7 +30,7 @@ export const AgentTable = ({ users, handleEditClick, setEdit, handleDeleteClick 
                     }}
                   />
                   <Delete
-                    handleClick={() => {
+                    handleClick={() => {    
                       handleDeleteClick(user);
                     }}
                   />

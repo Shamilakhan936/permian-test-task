@@ -1,4 +1,3 @@
-import { useState } from "react";
 import CalendlyEmbed from "../Calendly/Calendly";
 
 export const AgentModal = ({
@@ -25,6 +24,7 @@ export const AgentModal = ({
             Name
           </label>
           <input
+            required={true}
             id="name"
             className="bg-[#ebebeb] w-full h-8 p-2 rounded-md mt-2"
             value={formObj.name}
@@ -42,20 +42,22 @@ export const AgentModal = ({
             onChange={(e) =>
               setFormObj({ ...formObj, instructions: e.target.value })
             }
-          ></textarea>
-          <h2 className="   text-slate-500 text-left flex items-end	justify-end	">
-            0/150
+          />
+
+          <h2 className="text-slate-500 text-left flex items-end	justify-end	">
+            {formObj.instructions.length}/150
           </h2>
 
           <label id="tone" className="text-md	font-medium ">
             Select a tone
           </label>
+
           <input
             className="bg-[#ebebeb] w-full h-8 p-2 rounded-md mt-2"
             id="tone"
             value={formObj.tone}
             onChange={(e) => setFormObj({ ...formObj, tone: e.target.value })}
-          ></input>
+          />
 
           <div className="flex items-center justify-between mt-2">
             <h2 className="text-md font-medium	">Phone Number</h2>
@@ -67,7 +69,8 @@ export const AgentModal = ({
             onChange={(e) =>
               setFormObj({ ...formObj, phoneNumber: e.target.value })
             }
-          ></input>
+          />
+          
           <button
             className="bg-white text-black border w-full px-6 py-4 rounded-md hover:bg-green focus:outline-none focus:shadow-outline-green mt-8"
             onClick={() => {
@@ -85,7 +88,6 @@ export const AgentModal = ({
               }
             />
           )}
-          {/* <CalendlyEmbed url="https://calendly.com/shamilak936/30min" /> */}
 
           <input
             className="bg-[#ebebeb] w-full h-8 p-2 rounded-md mt-4"
@@ -95,7 +97,7 @@ export const AgentModal = ({
               setFormObj({ ...formObj, calendly: e.target.value })
             }
             placeholder="Write any other time you’re available"
-          ></input>
+          />
           <button
             className="bg-indigo-600 text-white px-6 py-4 rounded-md hover:bg-green focus:outline-none focus:shadow-outline-green w-full mt-8"
             onClick={onClick}

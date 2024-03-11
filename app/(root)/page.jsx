@@ -1,22 +1,20 @@
 "use client";
 
 import { UserButton, useUser } from "@clerk/nextjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AgentModal } from "../components/Modal/AgentModal";
 import { AgentTable } from "../components/AgentTable/AgentTable";
 import CreateAgentSuccess from "../components/Modal/CreateAgentSuccess";
 import { v4 } from "uuid";
 
 export default function Home() {
-  const { user, isLoaded } = useUser();
+  const { user } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formObj, setFormObj] = useState({});
   const [isCalendyOpen, setIsCalendyOpen] = useState(false);
   const [edit, setEdit] = useState(false);
   const [agentCreated, setAgentCreated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState({});
-  const [users, setUsers] = useState([]);
+  const [agents, setAgents] = useState([]);
 
   const createAgent = async () => {
     const response = await fetch(`/api/agent/new`, {
@@ -34,11 +32,56 @@ export default function Home() {
       }),
     });
     const data = await response.json();
-    setUserData(data);
-    setLoading(false);
+    setAgents([...agents, data]);
   };
 
-  console.log("user data", userData);
+  const updateAgent = async (id) => {
+    const response = await fetch(`/api/agent/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        clerkId: user.id,
+        name: formObj.name,
+        instructions: formObj.instructions,
+        tone: formObj.tone,
+        phoneNumber: formObj.phoneNumber,
+        calendly: formObj.calendly,
+      }),
+    });
+    const data = await response.json();
+    if (data) {
+      setAgents((prevUsers) => {
+        const updatedUsers = prevUsers.map((user) =>
+          user._id === data._id ? data : user
+        );
+        return updatedUsers;
+      });
+    }
+  };
+
+  const getAllAgents = async () => {
+    try {
+      const id = user?.id;
+      const response = await fetch(`/api/agent/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      setAgents(data);
+    } catch (e) {
+      console.log("error", e);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      getAllAgents();
+    }
+  }, [user]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -59,40 +102,23 @@ export default function Home() {
     setEdit(false);
   };
 
-  // const createAgent = async () => {
-  //   try {
-  //     // const newAgent = {
-  //     //   name: formObj.name,
-  //     //   instructions: formObj.instructions,
-  //     //   tone: formObj.tone,
-  //     //   phoneNumber: formObj.phoneNumber,
-  //     //   calendly: formObj.calendly,
-  //     // };
-  //     // await createOrUpdateAgent(newAgent);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   const handleGenerate = async () => {
+    if (formObj.name == "") {
+      alert("Please enter your name");
+    }
     if (!edit) {
       const newAgent = {
-        id: users.length + 1,
+        id: v4(),
         ...formObj,
       };
-      setUsers((prevUsers) => [...prevUsers, newAgent]);
+      setAgents((prevUsers) => [...prevUsers, newAgent]);
       setIsModalOpen(false);
       setAgentCreated(true);
       createAgent();
     } else {
-      setUsers((prevUsers) => {
-        const updatedUsers = prevUsers.map((user) =>
-          user.id === formObj.id ? formObj : user
-        );
-        setIsModalOpen(false);
-        setEdit(false);
-        return updatedUsers;
-      });
+      setIsModalOpen(false);
+      setEdit(false);
+      updateAgent(formObj._id);
     }
   };
 
@@ -102,10 +128,22 @@ export default function Home() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (userData) => {
-    setUsers((prevUsers) =>
-      prevUsers.filter((user) => user.id !== userData.id)
-    );
+  const handleDeleteClick = async (userData) => {
+    try {
+      const id = userData?._id;
+      const response = await fetch(`/api/agent/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (data) {
+        setAgents((prevUsers) => prevUsers.filter((user) => user._id !== id));
+      }
+    } catch (e) {
+      console.log("error", e);
+    }
   };
 
   return (
@@ -119,12 +157,13 @@ export default function Home() {
         </button>
         <UserButton />
       </div>
-      {users.length > 0 && (
+
+      {agents?.length > 0 && (
         <div>
           <div className="container mx-auto p-4 bg-white rounded">
             <h2 className="text-2xl font-bold mb-4">User List</h2>
             <AgentTable
-              users={users}
+              users={agents || []}
               handleEditClick={handleEditClick}
               handleDeleteClick={handleDeleteClick}
               setEdit={setEdit}
@@ -143,9 +182,12 @@ export default function Home() {
         isCalendyOpen={isCalendyOpen}
         isEdit={edit}
       />
+
       {agentCreated && (
         <div className="flex justify-center">
-          <CreateAgentSuccess />
+          <CreateAgentSuccess
+            handleBackdropClick={() => setAgentCreated(false)}
+          />
         </div>
       )}
     </div>
